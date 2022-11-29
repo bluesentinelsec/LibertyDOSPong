@@ -14,12 +14,16 @@ SOURCES = src/main.c
 # name of resulting EXE
 EXE = -o ./bin/DOSPONG
 
+# target MS-DOS and FreeDOS
 dos:
 	$(SETENV) && $(CC) $(CFLAGS) $(SOURCES) $(LIBS) $(EXE)
 
 
+# target Linux (for easy source-level debugging)
 linux:
 	gcc -ggdb -O0 $(SOURCES) -lalleg-debug -o bin/dospong
 
+
 clean:
-	rm -rf bin/DOSPONG*
+	rm -rf bin/DOSPON*
+	rm -rf bin/dospong
