@@ -1,8 +1,10 @@
-#include <allegro.h>
-#include <stdlib.h>
-
 #include "dbg.h"
 #include "game_config.h"
+#include "input.h"
+//#include "player.h"
+
+#include <allegro.h>
+#include <stdlib.h>
 
 int main(int argc, char *argv[])
 {
@@ -13,26 +15,37 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // initialize allegro drivers
-    install_timer();
-    install_keyboard();
-
     // set video mode
-    if (set_gfx_mode(video_mode, display_width, display_height, 0, 0) != 0)
+    if (set_gfx_mode(_videoMode, _displayWidth, _displayHeight, 0, 0) != 0)
     {
         log_err("unable to set video mode");
         return EXIT_FAILURE;
     }
 
-    // install sound driver
+    // initialize allegro drivers
+
+    if (install_timer() != 0)
+    {
+        log_err("unable to initialize timer");
+        return EXIT_FAILURE;
+    }
+
+    if (install_keyboard() != 0)
+    {
+        log_err("unable to initialize keyboard");
+        return EXIT_FAILURE;
+    }
+
     if (install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL) != 0)
     {
         log_err("unable to initialize sound driver");
         return EXIT_FAILURE;
     }
 
+    // load resources
+
     // load MIDI file
-    MIDI *music = load_midi("media/kraid.mid");
+    MIDI *music = load_midi("media/brinstar.mid");
     if (!music)
     {
         log_err("unable to load midi file");
@@ -62,25 +75,68 @@ int main(int argc, char *argv[])
     }
 
     // create backbuffer
-    BITMAP *backbuffer = create_bitmap(virtual_screen_width, virtual_screen_height);
+    BITMAP *backbuffer = create_bitmap(vScreenHeight, vScreenWidth);
     int BLACK = makecol(0, 0, 0);
+    int WHITE = makecol(255, 255, 255);
+    int GREEN = makecol(0, 255, 0);
 
+    int yPos = 50;
+    int xPos = 50;
     // game loop
     while (!key[KEY_ESC])
     {
         // clear backbuffer
-        rectfill(backbuffer, 0, 0, virtual_screen_width, virtual_screen_height, BLACK);
+        rectfill(backbuffer, 0, 0, vScreenHeight, vScreenWidth, BLACK);
 
-        // make sure we're actually drawing to the screen
-        circlefill(backbuffer, virtual_screen_width / 2, virtual_screen_height / 2, 40, makecol(0, 255, 0));
+        //updatePlayerStub(backbuffer);
+        
+        if (key[KEY_UP])
+        {
+            textout_ex(backbuffer, font, "pressed up", 10, 10, WHITE, 0);
+            yPos -= 1;
+        }
+
+        if (key[KEY_DOWN])
+        {
+            textout_ex(backbuffer, font, "pressed down", 10, 10, WHITE, 0);
+            yPos += 1;
+        }
+
+        if (IsKeyDown(KEY_LEFT))
+        {
+            textout_ex(backbuffer, font, "pressed left", 10, 10, WHITE, 0);
+            xPos -= 1;
+        }
+
+        if (IsKeyDown(KEY_RIGHT))
+        {
+            textout_ex(backbuffer, font, "pressed right", 10, 10, WHITE, 0);
+            xPos += 1;
+        }
+
+        if (IsKeyPressedOnce(KEY_SPACE))
+        {
+            textout_ex(backbuffer, font, "pressed space", 10, 10, WHITE, 0);
+            yPos -= 5;
+        }
+
+        // clamp circle to screen
+        if (yPos >= vScreenHeight) yPos = vScreenHeight;
+        if (yPos <= 0) yPos = 0;
+        if (xPos >= vScreenWidth) xPos = vScreenWidth;
+        if (xPos <= 0) xPos = 0;
+
+        circlefill(backbuffer, xPos, yPos, 40, GREEN);
+        textout_ex(backbuffer, font, "TEXT", 10, 20, GREEN, 0);
 
         // game loop
 
         // flip back buffer
-        stretch_blit(backbuffer, screen, 0, 0, virtual_screen_width, virtual_screen_height, 0, 0, display_width, display_height);
+        stretch_blit(backbuffer, screen, 0, 0, vScreenHeight, vScreenWidth, 0, 0, _displayWidth, _displayHeight);
     }
 
     destroy_midi(music);
+    destroy_sample(sfx);
 
     return EXIT_SUCCESS;
 }

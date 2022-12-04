@@ -16,8 +16,10 @@ EXE = -o ./bin/DOSPONG
 
 # target MS-DOS and FreeDOS
 dos:
-	$(SETENV) && $(CC) $(CFLAGS) $(SOURCES) $(LIBS) $(EXE)
+	$(SETENV) && $(CC) $(CFLAGS) $(SOURCES) $(LIBS) -O2 $(EXE).exe
 
+run:
+	dosbox ./bin/DOSPONG.exe
 
 # target Linux (for easy source-level debugging)
 linux:
