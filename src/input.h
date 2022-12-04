@@ -1,5 +1,4 @@
-#ifndef INPUT_H
-#define INPUT_H
+#pragma once
 
 #include <stdbool.h>
 #include <string.h>
@@ -51,4 +50,3 @@ inline static bool IsKeyPressedOnce(int theKey)
         }
     }
 }
-#endif

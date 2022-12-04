@@ -5,11 +5,11 @@ CC = /opt/djgpp/bin/i586-pc-msdosdjgpp-gcc
 SETENV = /opt/djgpp/setenv
 
 # used to link to Allegro game library
-CFLAGS = -I external/allegro/include/
+CFLAGS = -I external/allegro/include/ -fgnu89-inline
 LIBS = -L external/allegro/lib/ -lalleg
 
 # set source files
-SOURCES = src/main.c
+SOURCES = src/main.c src/player.c
 
 # name of resulting EXE
 EXE = -o ./bin/DOSPONG

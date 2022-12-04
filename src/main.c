@@ -1,10 +1,30 @@
 #include "dbg.h"
 #include "game_config.h"
 #include "input.h"
-//#include "player.h"
+#include "player.h"
 
 #include <allegro.h>
 #include <stdlib.h>
+
+unsigned long long int ticks = 0;
+const double fps = 60.0f;
+const double frameDelay = 1000.0f / fps;
+
+int frameCounter = 0;
+int AvgFPS = 0;
+
+void gameTimer(void)
+{
+    ticks += 1;
+}
+END_OF_FUNCTION(gameTimer);
+
+void fpsCounter(void)
+{
+    AvgFPS = frameCounter;
+    frameCounter = 0;
+}
+END_OF_FUNCTION(fpsCounter);
 
 int main(int argc, char *argv[])
 {
@@ -74,6 +94,15 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    // setup timer
+    LOCK_VARIABLE(ticks);
+    LOCK_FUNCTION(gameTimer);
+    install_int(gameTimer, 1);
+
+    LOCK_VARIABLE(AvgFPS);
+    LOCK_FUNCTION(fpsCounter);
+    install_int(fpsCounter, 1000);
+
     // create backbuffer
     BITMAP *backbuffer = create_bitmap(vScreenHeight, vScreenWidth);
     int BLACK = makecol(0, 0, 0);
@@ -82,57 +111,80 @@ int main(int argc, char *argv[])
 
     int yPos = 50;
     int xPos = 50;
+
     // game loop
+    unsigned long long int startFrameTime = 0;
+    unsigned long long int endFrameTime = 0;
+
+    int speed = 10;
     while (!key[KEY_ESC])
     {
+        // measure start of frame
+        startFrameTime = ticks;
+        frameCounter += 1;
+
         // clear backbuffer
         rectfill(backbuffer, 0, 0, vScreenHeight, vScreenWidth, BLACK);
 
-        //updatePlayerStub(backbuffer);
-        
+        updatePlayerStub(backbuffer);
+
         if (key[KEY_UP])
         {
             textout_ex(backbuffer, font, "pressed up", 10, 10, WHITE, 0);
-            yPos -= 1;
+            yPos -= speed * endFrameTime;
         }
 
         if (key[KEY_DOWN])
         {
             textout_ex(backbuffer, font, "pressed down", 10, 10, WHITE, 0);
-            yPos += 1;
+            yPos += speed * endFrameTime;
         }
 
         if (IsKeyDown(KEY_LEFT))
         {
             textout_ex(backbuffer, font, "pressed left", 10, 10, WHITE, 0);
-            xPos -= 1;
+            xPos -= speed * endFrameTime;
         }
 
         if (IsKeyDown(KEY_RIGHT))
         {
             textout_ex(backbuffer, font, "pressed right", 10, 10, WHITE, 0);
-            xPos += 1;
+            xPos += speed * endFrameTime;
         }
 
         if (IsKeyPressedOnce(KEY_SPACE))
         {
             textout_ex(backbuffer, font, "pressed space", 10, 10, WHITE, 0);
-            yPos -= 5;
+            yPos -= speed * endFrameTime;
         }
 
         // clamp circle to screen
-        if (yPos >= vScreenHeight) yPos = vScreenHeight;
-        if (yPos <= 0) yPos = 0;
-        if (xPos >= vScreenWidth) xPos = vScreenWidth;
-        if (xPos <= 0) xPos = 0;
+        if (yPos >= vScreenHeight)
+            yPos = vScreenHeight;
+        if (yPos <= 0)
+            yPos = 0;
+        if (xPos >= vScreenWidth)
+            xPos = vScreenWidth;
+        if (xPos <= 0)
+            xPos = 0;
 
         circlefill(backbuffer, xPos, yPos, 40, GREEN);
         textout_ex(backbuffer, font, "TEXT", 10, 20, GREEN, 0);
+        textprintf_ex(backbuffer, font, 2, 100, WHITE, 0, "FPS: %d", AvgFPS);
 
         // game loop
 
         // flip back buffer
         stretch_blit(backbuffer, screen, 0, 0, vScreenHeight, vScreenWidth, 0, 0, _displayWidth, _displayHeight);
+
+        // measure end of frame
+        endFrameTime = ticks - startFrameTime;
+
+        if (endFrameTime < frameDelay)
+        {
+            double rest_period = frameDelay - endFrameTime;
+            rest(rest_period);
+        }
     }
 
     destroy_midi(music);
