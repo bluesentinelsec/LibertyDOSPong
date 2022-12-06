@@ -109,16 +109,22 @@ int main(int argc, char *argv[])
     int WHITE = makecol(255, 255, 255);
     int GREEN = makecol(0, 255, 0);
 
-    int yPos = 50;
-    int xPos = 50;
+    float yPos = 50;
+    float xPos = 50;
 
     // game loop
 
-    int speed = 1;
+    int speed = 100;
+    unsigned long prevFrameTick;
+    unsigned long currFrameTick = gameTimeInMiliSeconds;
+
     while (!key[KEY_ESC])
     {
         // measure start of frame
-        unsigned long startFrameTime = gameTimeInMiliSeconds;
+        prevFrameTick = currFrameTick;
+        currFrameTick = gameTimeInMiliSeconds;
+        double deltaTime = (currFrameTick - prevFrameTick) / 1000.0f;
+
         frameCounter += 1;
 
         // clear backbuffer
@@ -129,25 +135,25 @@ int main(int argc, char *argv[])
         if (key[KEY_UP])
         {
             textout_ex(backbuffer, font, "pressed up", 10, 10, WHITE, 0);
-            yPos -= speed;
+            yPos -= speed * deltaTime;
         }
 
         if (key[KEY_DOWN])
         {
             textout_ex(backbuffer, font, "pressed down", 10, 10, WHITE, 0);
-            yPos += speed;
+            yPos += speed * deltaTime;
         }
 
         if (IsKeyDown(KEY_LEFT))
         {
             textout_ex(backbuffer, font, "pressed left", 10, 10, WHITE, 0);
-            xPos -= speed;
+            xPos -= speed * deltaTime;
         }
 
         if (IsKeyDown(KEY_RIGHT))
         {
             textout_ex(backbuffer, font, "pressed right", 10, 10, WHITE, 0);
-            xPos += speed;
+            xPos += speed * deltaTime;
         }
 
         if (IsKeyPressedOnce(KEY_SPACE))
@@ -156,34 +162,21 @@ int main(int argc, char *argv[])
             yPos -= speed;
         }
 
-        // clamp circle to screen
-        if (yPos >= vScreenHeight)
-            yPos = vScreenHeight;
-        if (yPos <= 0)
-            yPos = 0;
-        if (xPos >= vScreenWidth)
-            xPos = vScreenWidth;
-        if (xPos <= 0)
-            xPos = 0;
-
         circlefill(backbuffer, xPos, yPos, 40, GREEN);
 
         // game loop
-        unsigned long restPeriod = startFrameTime + frameDelay - gameTimeInMiliSeconds;
         textprintf_ex(backbuffer, font, 2, 20, WHITE, 0, "Total game ticks: %lu", gameTimeInMiliSeconds);
-        textprintf_ex(backbuffer, font, 2, 30, WHITE, 0, "Start frame ticks: %lu", startFrameTime);
-        textprintf_ex(backbuffer, font, 2, 40, WHITE, 0, "Rest period: %lu", restPeriod);
-        textprintf_ex(backbuffer, font, 2, 50, WHITE, 0, "FPS: %d", AvgFPS);
+        textprintf_ex(backbuffer, font, 2, 30, WHITE, 0, "currFrameTick: %lu", currFrameTick);
+        textprintf_ex(backbuffer, font, 2, 40, WHITE, 0, "prevFrameTick: %lu", prevFrameTick);
+        textprintf_ex(backbuffer, font, 2, 50, WHITE, 0, "deltaTime: %lf", deltaTime);
+        textprintf_ex(backbuffer, font, 2, 60, WHITE, 0, "FPS: %d", AvgFPS);
+        textprintf_ex(backbuffer, font, 2, 70, WHITE, 0, "xPos: %.2f", xPos);
+        textprintf_ex(backbuffer, font, 2, 80, WHITE, 0, "yPos: %.2f", yPos);
 
         // flip back buffer
         stretch_blit(backbuffer, screen, 0, 0, vScreenHeight, vScreenWidth, 0, 0, _displayWidth, _displayHeight);
-
-        // don't rest is restPeriod is negative
-        if (restPeriod <= 0)
-        {
-            continue;
-        }
-        rest((unsigned int)restPeriod);
+        
+        rest(5); // give some time back to CPU
     }
 
     destroy_midi(music);
