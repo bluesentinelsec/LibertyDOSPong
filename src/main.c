@@ -169,22 +169,25 @@ int main(int argc, char *argv[])
             xPos = 0;
 
         circlefill(backbuffer, xPos, yPos, 40, GREEN);
-        textout_ex(backbuffer, font, "TEXT", 10, 20, GREEN, 0);
-        textprintf_ex(backbuffer, font, 2, 100, WHITE, 0, "FPS: %d", AvgFPS);
-
+        
         // game loop
 
-        // flip back buffer
-        stretch_blit(backbuffer, screen, 0, 0, vScreenHeight, vScreenWidth, 0, 0, _displayWidth, _displayHeight);
-
-        // measure end of frame
         endFrameTime = ticks - startFrameTime;
+
+        textprintf_ex(backbuffer, font, 2, 20, WHITE, 0, "Start frame ticks: %llu", startFrameTime);
+        textprintf_ex(backbuffer, font, 2, 30, WHITE, 0, "End frame ticks: %llu", endFrameTime);
+        textprintf_ex(backbuffer, font, 2, 100, WHITE, 0, "FPS: %d", AvgFPS);
+
 
         if (endFrameTime < frameDelay)
         {
             double rest_period = frameDelay - endFrameTime;
+            textprintf_ex(backbuffer, font, 2, 50, WHITE, 0, "rest period: %.2f", rest_period);
             rest(rest_period);
         }
+
+        // flip back buffer
+        stretch_blit(backbuffer, screen, 0, 0, vScreenHeight, vScreenWidth, 0, 0, _displayWidth, _displayHeight);
     }
 
     destroy_midi(music);
