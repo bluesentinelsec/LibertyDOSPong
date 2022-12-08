@@ -9,7 +9,7 @@ CFLAGS = -I external/allegro/include/ -fgnu89-inline
 LIBS = -L external/allegro/lib/ -lalleg
 
 # set source files
-SOURCES = src/main.c src/player.c
+SOURCES = src/main.c src/ldp_game.c
 
 # name of resulting EXE
 EXE = -o ./bin/DOSPONG
@@ -24,6 +24,7 @@ run:
 # target Linux (for easy source-level debugging)
 linux:
 	gcc -ggdb -O0 $(SOURCES) -lalleg-debug -o bin/dospong
+	cd ./bin/ && ./dospong
 
 
 clean:
