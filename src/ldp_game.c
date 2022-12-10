@@ -1,3 +1,4 @@
+#include "ldp_entity.h"
 #include "ldp_game.h"
 #include "dbg.h"
 
@@ -107,6 +108,13 @@ void ldp_RunGame(void)
     unsigned long prevFrameTick;
     unsigned long currFrameTick = gameTimeInMiliSeconds;
 
+    Entity_t *playerCharacter = ldp_NewEntity(LDP_PLAYER_1_TYPE);
+    playerCharacter->InitEntity(playerCharacter->self);
+    playerCharacter->UpdateEntity(playerCharacter->self, 0);
+    playerCharacter->DrawEntity(playerCharacter->self, 0);
+
+    ldp_DeleteEntity(playerCharacter);
+
     while (gameIsRunning)
     {
         frameCounter += 1;
@@ -120,7 +128,6 @@ void ldp_RunGame(void)
         }
 
         // ToDo:
-        // sceneManager.ProcessInput()
         // sceneManager.UpdateEntities(deltaTime)
         clear_bitmap(ldp_BackBuffer);
         // sceneManager.DrawScene(ldp_BackBuffer)
