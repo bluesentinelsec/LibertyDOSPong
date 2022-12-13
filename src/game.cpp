@@ -1,6 +1,6 @@
-#include "ldp_entity.h"
-#include "ldp_game.h"
+#include "game.hpp"
 #include "dbg.h"
+#include "input.hpp"
 
 #include <stdbool.h>
 
@@ -26,7 +26,7 @@ void frameRateTimer(void)
 }
 END_OF_FUNCTION(frameRateTimer);
 
-int ldp_InitGame(void)
+int GameEngine::InitGame(void)
 {
     if (allegro_init() != 0)
     {
@@ -102,18 +102,11 @@ static int set_video_mode(void)
     return 0;
 }
 
-void ldp_RunGame(void)
+void GameEngine::RunGame(void)
 {
     bool gameIsRunning = true;
     unsigned long prevFrameTick;
     unsigned long currFrameTick = gameTimeInMiliSeconds;
-
-    Entity_t *playerCharacter = ldp_NewEntity(LDP_PLAYER_1_TYPE);
-    playerCharacter->InitEntity(playerCharacter->self);
-    playerCharacter->UpdateEntity(playerCharacter->self, 0);
-    playerCharacter->DrawEntity(playerCharacter->self, 0);
-
-    ldp_DeleteEntity(playerCharacter);
 
     while (gameIsRunning)
     {
@@ -122,15 +115,12 @@ void ldp_RunGame(void)
         currFrameTick = gameTimeInMiliSeconds;
         double deltaTime = (currFrameTick - prevFrameTick) / 1000.0f;
 
-        if (key[KEY_ESC])
+        if (IsKeyPressedOnce(KEY_ESC))
         {
             gameIsRunning = false;
         }
 
-        // ToDo:
-        // sceneManager.UpdateEntities(deltaTime)
         clear_bitmap(ldp_BackBuffer);
-        // sceneManager.DrawScene(ldp_BackBuffer)
 
         textprintf_ex(ldp_BackBuffer, font, 2, 10, makecol(255, 255, 255), 0, "Frame rate: %d", FPS);
         textprintf_ex(ldp_BackBuffer, font, 2, 20, makecol(255, 255, 255), 0, "deltaTime: %lf", deltaTime);
@@ -143,7 +133,7 @@ void ldp_RunGame(void)
     return;
 }
 
-void ldp_QuitGame(void)
+void GameEngine::QuitGame(void)
 {
     if (ldp_BackBuffer != NULL)
     {

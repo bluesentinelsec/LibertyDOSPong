@@ -3,20 +3,22 @@
 #include <allegro.h>
 
 #include "dbg.h"
-#include "ldp_game.h"
+#include "game.hpp"
 
 int main(int argc, char *argv[])
 {
 
-    if (ldp_InitGame() != 0)
+    GameEngine game;
+    
+    if (game.InitGame() != 0)
     {
         log_err("unable to initialize game");
         return EXIT_FAILURE;
     }
 
-    ldp_RunGame();
+    game.RunGame();
 
-    ldp_QuitGame();
+    game.QuitGame();
 
     return EXIT_SUCCESS;
 }
