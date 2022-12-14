@@ -2,6 +2,9 @@
 #include "dbg.h"
 #include "input.hpp"
 
+#include "entity.hpp"
+#include "playerPaddle/playerPaddle.hpp"
+
 #include <stdbool.h>
 
 static BITMAP *ldp_BackBuffer;
@@ -96,7 +99,9 @@ static int set_video_mode(void)
         return -1;
     }
 
-    // init scene manager
+    // create title screen object
+    // create scene manager object
+    // pass scene manager ptr to
     // set starting scene
 
     return 0;
@@ -107,6 +112,14 @@ void GameEngine::RunGame(void)
     bool gameIsRunning = true;
     unsigned long prevFrameTick;
     unsigned long currFrameTick = gameTimeInMiliSeconds;
+
+    // test entities
+    PlayerPaddle thePlayer;
+    thePlayer.Init();
+    thePlayer.Update();
+    thePlayer.Destroy();
+    
+    rest(5000);
 
     while (gameIsRunning)
     {

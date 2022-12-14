@@ -9,9 +9,9 @@ CFLAGS = -I external/allegro/include/
 LIBS = -L external/allegro/lib/ -lalleg
 
 # set source files
-SOURCES = src/main.cpp src/game.cpp
-#SOURCES = src/main.c src/ldp_game.c src/ldp_entity.c \
-#		  src/ldp_player1.c
+SOURCES = 	src/main.cpp src/game.cpp \
+			src/playerPaddle/playerPaddle.cpp \
+			src/playerPaddle/playerInput.cpp
 
 # name of resulting EXE
 EXE = -o ./bin/DOSPONG
