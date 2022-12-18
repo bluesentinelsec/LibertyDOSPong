@@ -11,22 +11,31 @@ LIBS = -L external/allegro/lib/ -lalleg
 # set source files
 SOURCES = 	src/main.cpp src/game.cpp \
 			src/playerPaddle/playerPaddle.cpp \
-			src/playerPaddle/playerInput.cpp
+			src/playerPaddle/playerInput.cpp \
+			src/sceneManager.cpp \
+			src/scenes/splashScene.cpp \
+			src/scenes/titleScene.cpp \
+			src/scenes/playScene.cpp \
+			src/scenes/winScene.cpp \
+			src/scenes/loseScene.cpp \
+			src/scenes/creditsScene.cpp
 
 # name of resulting EXE
 EXE = -o ./bin/DOSPONG
 
 # target MS-DOS and FreeDOS
 dos:
-	$(SETENV) && $(CC) $(CFLAGS) $(SOURCES) $(LIBS) -O2 $(EXE).exe
+	$(SETENV) && $(CC) $(CFLAGS) $(SOURCES) $(LIBS) -O2 $(EXE).exe -DNDEBUG
 
-run:
+run-dos:
 	dosbox ./bin/DOSPONG.exe
+
+run-linux:
+	cd bin && ./dospong
 
 # target Linux (for easy source-level debugging)
 linux:
-	gcc -ggdb -O0 $(SOURCES) -lalleg-debug -o bin/dospong
-	cd ./bin/ && ./dospong
+	g++ -ggdb -O0 $(SOURCES) -lalleg-debug -o bin/dospong
 
 
 clean:

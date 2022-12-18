@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sceneManager.hpp"
+
 #include <allegro.h>
 
 class GameEngine
@@ -9,6 +11,8 @@ public:
     void RunGame(void);
     void QuitGame(void);
 
+private:
+    SceneManager *sceneManager;
 };
 
 // define the logical screen height and width

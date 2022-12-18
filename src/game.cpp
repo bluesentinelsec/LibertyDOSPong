@@ -5,6 +5,8 @@
 #include "entity.hpp"
 #include "playerPaddle/playerPaddle.hpp"
 
+#include "scenes/splashScene.hpp"
+
 #include <stdbool.h>
 
 static BITMAP *ldp_BackBuffer;
@@ -78,6 +80,18 @@ int GameEngine::InitGame(void)
         return -1;
     }
 
+    // create the scene manager
+    sceneManager = new SceneManager();
+
+    // create the splash scene
+    SplashScene *splashScene = new SplashScene();
+
+    // pass scene manager ptr to splash scene
+    splashScene->Init(sceneManager);
+
+    // set scene to splash scene
+    sceneManager->ChangeScene(splashScene);
+
     return 0;
 }
 
@@ -114,12 +128,10 @@ void GameEngine::RunGame(void)
     unsigned long currFrameTick = gameTimeInMiliSeconds;
 
     // test entities
-    PlayerPaddle thePlayer;
-    thePlayer.Init();
-    thePlayer.Update();
-    thePlayer.Destroy();
-    
-    rest(5000);
+    // PlayerPaddle thePlayer;
+    // thePlayer.Init();
+    // thePlayer.Update();
+    // thePlayer.Destroy();
 
     while (gameIsRunning)
     {
@@ -138,10 +150,15 @@ void GameEngine::RunGame(void)
         textprintf_ex(ldp_BackBuffer, font, 2, 10, makecol(255, 255, 255), 0, "Frame rate: %d", FPS);
         textprintf_ex(ldp_BackBuffer, font, 2, 20, makecol(255, 255, 255), 0, "deltaTime: %lf", deltaTime);
 
+        // update scene
+        sceneManager->ProcessInput();
+        sceneManager->UpdateScene(deltaTime);
+        sceneManager->DrawScene(ldp_BackBuffer);
+
         // flip back buffer
         stretch_blit(ldp_BackBuffer, screen, 0, 0, vScreenHeight, vScreenWidth, 0, 0, _displayWidth, _displayHeight);
 
-        rest(5); // give some time back to CPU
+        rest(3); // give some time back to CPU
     }
     return;
 }
